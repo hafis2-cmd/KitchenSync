@@ -179,7 +179,8 @@ export default function App() {
       });
 
     // SSE EventSource for Real-Time Multi-Client Sync
-    const eventSource = new EventSource('/api/events/stream');
+    const API_URL = import.meta.env.VITE_API_URL || '';
+    const eventSource = new EventSource(`${API_URL}/api/events/stream`);
 
     eventSource.onopen = () => {
       setIsLiveSynced(true);

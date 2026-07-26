@@ -13,6 +13,19 @@ import {
   UserRole
 } from '../types';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
+// Redirect relative api fetches to base backend host in production/cross-origin mode
+if (typeof window !== 'undefined') {
+  const originalFetch = window.fetch;
+  window.fetch = function (input: RequestInfo | URL, init?: RequestInit) {
+    if (typeof input === 'string' && input.startsWith('/api')) {
+      return originalFetch(API_URL + input, init);
+    }
+    return originalFetch(input, init);
+  };
+}
+
 export interface AppState {
   users: User[];
   menuItems: MenuItem[];
