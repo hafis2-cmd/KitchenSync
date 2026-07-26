@@ -238,435 +238,72 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="p-4 sm:p-6 pb-0">
-          <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-2xl mb-5">
-            <button
-              id="auth-tab-login"
-              type="button"
-              onClick={() => {
-                setMode('login');
-                setError('');
-                setSignUpSuccessUser(null);
-              }}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
-                mode === 'login'
-                  ? 'bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              Log In
-            </button>
-            <button
-              id="auth-tab-signup"
-              type="button"
-              onClick={() => {
-                setMode('signup');
-                setError('');
-                setSignUpSuccessUser(null);
-              }}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all ${
-                mode === 'signup'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              Sign Up
-            </button>
+        {/* Error Message Banner */}
+        {error && (
+          <div className="mx-6 mt-4 p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-fadeIn">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+            <p className="font-medium">{error}</p>
+          </div>
+        )}
+
+        {/* Modal Body: Only 1-Click Demo Accounts */}
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-amber-500" /> Select Demo Role
+            </span>
+            <span className="text-[10px] text-gray-400">Instant Access</span>
           </div>
 
-          {/* Error Message Banner */}
-          {error && (
-            <div className="mb-4 p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-fadeIn">
-              <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
-              <p className="font-medium">{error}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Modal Body */}
-        <div className="px-4 sm:px-6 pb-6">
-          {mode === 'login' ? (
-            /* ================= LOG IN FORM ================= */
-            <div>
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                {/* Email Input */}
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
-                    Work Email ID
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
-                    <input
-                      id="auth-login-email"
-                      type="email"
-                      required
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                      placeholder="e.g. waiter@kitchensync.com"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-medium"
-                    />
-                  </div>
-                </div>
-
-                {/* Password Input */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">
-                      Password
-                    </label>
-                    <button
-                      id="auth-login-forgot-btn"
-                      type="button"
-                      onClick={() => {
-                        setShowForgotPassword(true);
-                        setResetSuccess(false);
-                      }}
-                      className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                    >
-                      <HelpCircle className="w-3 h-3" />
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
-                    <input
-                      id="auth-login-password"
-                      type={showLoginPassword ? 'text' : 'password'}
-                      required
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      placeholder="••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-medium"
-                    />
-                    <button
-                      id="auth-login-password-toggle"
-                      type="button"
-                      onClick={() => setShowLoginPassword(!showLoginPassword)}
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                    >
-                      {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Remember Me */}
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      id="auth-login-remember"
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
-                    />
-                    <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">Keep me signed in</span>
-                  </label>
-                  <span className="text-[10px] text-gray-400">Default demo pass: <code className="text-blue-600 dark:text-blue-400 font-bold">password123</code></span>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  id="auth-login-submit-btn"
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {loading ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Authenticating Account...
-                    </>
-                  ) : (
-                    <>
-                      <LogIn className="w-4 h-4" />
-                      Log In to Workspace
-                    </>
-                  )}
-                </button>
-              </form>
-
-              {/* Quick Demo Access Bar */}
-              <div className="mt-6 pt-5 border-t border-gray-100 dark:border-gray-800">
-                <div className="flex items-center justify-between mb-2.5">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-amber-500" /> 1-Click Demo Accounts
-                  </span>
-                  <span className="text-[10px] text-gray-400">Instant Test</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    id="auth-demo-waiter-btn"
-                    type="button"
-                    onClick={() => handleQuickDemoLogin('waiter')}
-                    className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/80 hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 text-xs font-bold flex flex-col items-center gap-1 transition-all"
-                  >
-                    <UserCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span>Waitstaff</span>
-                  </button>
-
-                  <button
-                    id="auth-demo-kitchen-btn"
-                    type="button"
-                    onClick={() => handleQuickDemoLogin('kitchen')}
-                    className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/80 hover:bg-purple-50 dark:hover:bg-purple-950/40 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 text-xs font-bold flex flex-col items-center gap-1 transition-all"
-                  >
-                    <ChefHat className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                    <span>Kitchen</span>
-                  </button>
-
-                  <button
-                    id="auth-demo-manager-btn"
-                    type="button"
-                    onClick={() => handleQuickDemoLogin('manager')}
-                    className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 text-xs font-bold flex flex-col items-center gap-1 transition-all"
-                  >
-                    <LayoutDashboard className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span>Manager</span>
-                  </button>
-                </div>
+          <div className="flex flex-col gap-3">
+            <button
+              id="auth-demo-waiter-btn"
+              type="button"
+              disabled={loading}
+              onClick={() => handleQuickDemoLogin('waiter')}
+              className="w-full p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/80 hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 text-sm font-bold flex items-center gap-4 transition-all disabled:opacity-50"
+            >
+              <div className="p-2.5 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+                <UserCheck className="w-5 h-5" />
               </div>
-            </div>
-          ) : (
-            /* ================= SIGN UP FORM ================= */
-            <div>
-              {signUpSuccessUser ? (
-                /* Success State */
-                <div className="py-6 text-center space-y-3">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 shadow-sm animate-bounce">
-                    <CheckCircle2 className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">Registration Successful!</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-300 max-w-xs mx-auto">
-                    Welcome aboard, <span className="font-bold text-blue-600 dark:text-blue-400">{signUpSuccessUser.name}</span>!
-                  </p>
-                  <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 rounded-xl text-xs text-blue-900 dark:text-blue-200 font-medium">
-                    Requested Job Role: <span className="font-bold uppercase">{signUpSuccessUser.requestedRole}</span>
-                  </div>
-                  <p className="text-[11px] text-gray-400 flex items-center justify-center gap-1 pt-2">
-                    <RefreshCw className="w-3 h-3 animate-spin text-blue-500" /> Redirecting to your workspace...
-                  </p>
-                </div>
-              ) : (
-                /* Registration Inputs */
-                <form onSubmit={handleSignUpSubmit} className="space-y-3.5">
-                  {/* Full Name */}
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                      Full Name <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <UserIcon className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
-                      <input
-                        id="auth-signup-name"
-                        type="text"
-                        required
-                        value={signUpName}
-                        onChange={(e) => setSignUpName(e.target.value)}
-                        placeholder="e.g. Alex Morgan"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-medium"
-                      />
-                    </div>
-                  </div>
+              <div className="text-left">
+                <p className="font-bold">Waitstaff View</p>
+                <p className="text-[11px] text-gray-500 font-normal mt-0.5">Floor Plan & Table Orders</p>
+              </div>
+            </button>
 
-                  {/* Email ID */}
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                      Email Address <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
-                      <input
-                        id="auth-signup-email"
-                        type="email"
-                        required
-                        value={signUpEmail}
-                        onChange={(e) => setSignUpEmail(e.target.value)}
-                        placeholder="alex@kitchensync.com"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-medium"
-                      />
-                    </div>
-                  </div>
+            <button
+              id="auth-demo-kitchen-btn"
+              type="button"
+              disabled={loading}
+              onClick={() => handleQuickDemoLogin('kitchen')}
+              className="w-full p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/80 hover:bg-purple-50 dark:hover:bg-purple-950/40 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 text-sm font-bold flex items-center gap-4 transition-all disabled:opacity-50"
+            >
+              <div className="p-2.5 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400">
+                <ChefHat className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold">Kitchen Display (KDS)</p>
+                <p className="text-[11px] text-gray-500 font-normal mt-0.5">Active Ticket Preparation</p>
+              </div>
+            </button>
 
-                  {/* Password + Strength Meter */}
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                      Password <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
-                      <input
-                        id="auth-signup-password"
-                        type={showSignUpPassword ? 'text' : 'password'}
-                        required
-                        value={signUpPassword}
-                        onChange={(e) => setSignUpPassword(e.target.value)}
-                        placeholder="Create password"
-                        className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-medium"
-                      />
-                      <button
-                        id="auth-signup-password-toggle"
-                        type="button"
-                        onClick={() => setShowSignUpPassword(!showSignUpPassword)}
-                        className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                      >
-                        {showSignUpPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-
-                    {/* Password Strength Indicator */}
-                    {signUpPassword && (
-                      <div className="mt-1.5 space-y-1">
-                        <div className="flex items-center justify-between text-[10px]">
-                          <span className="text-gray-500">Strength:</span>
-                          <span className={`font-bold ${strength.text}`}>{strength.label}</span>
-                        </div>
-                        <div className="w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full ${strength.color} transition-all duration-300`}
-                            style={{ width: `${(strength.score / 3) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Confirm Password */}
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                      Confirm Password <span className="text-rose-500">*</span>
-                    </label>
-                    <div className="relative">
-                      <KeyRound className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
-                      <input
-                        id="auth-signup-confirm"
-                        type="password"
-                        required
-                        value={signUpConfirmPassword}
-                        onChange={(e) => setSignUpConfirmPassword(e.target.value)}
-                        placeholder="Re-enter password"
-                        className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-medium"
-                      />
-                      {signUpConfirmPassword && (
-                        <div className="absolute right-3 top-3">
-                          {signUpPassword === signUpConfirmPassword ? (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                          ) : (
-                            <AlertCircle className="w-4 h-4 text-rose-500" />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Phone Number */}
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                      Phone Number (Optional)
-                    </label>
-                    <div className="relative">
-                      <Phone className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
-                      <input
-                        id="auth-signup-phone"
-                        type="tel"
-                        value={signUpPhone}
-                        onChange={(e) => setSignUpPhone(e.target.value)}
-                        placeholder="+1 (555) 000-0000"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-medium"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Role Selector */}
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5">
-                      Requested Role
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button
-                        id="auth-signup-role-waiter"
-                        type="button"
-                        onClick={() => setRequestedRole('waiter')}
-                        className={`p-2 rounded-xl text-xs font-bold border flex flex-col items-center gap-1 transition-all ${
-                          requestedRole === 'waiter'
-                            ? 'bg-blue-50 dark:bg-blue-950/60 border-blue-600 text-blue-700 dark:text-blue-300 shadow-xs'
-                            : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100'
-                        }`}
-                      >
-                        <UserCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        <span>Waitstaff</span>
-                      </button>
-
-                      <button
-                        id="auth-signup-role-kitchen"
-                        type="button"
-                        onClick={() => setRequestedRole('kitchen')}
-                        className={`p-2 rounded-xl text-xs font-bold border flex flex-col items-center gap-1 transition-all ${
-                          requestedRole === 'kitchen'
-                            ? 'bg-purple-50 dark:bg-purple-950/60 border-purple-600 text-purple-700 dark:text-purple-300 shadow-xs'
-                            : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100'
-                        }`}
-                      >
-                        <ChefHat className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                        <span>Kitchen</span>
-                      </button>
-
-                      <button
-                        id="auth-signup-role-manager"
-                        type="button"
-                        onClick={() => setRequestedRole('manager')}
-                        className={`p-2 rounded-xl text-xs font-bold border flex flex-col items-center gap-1 transition-all ${
-                          requestedRole === 'manager'
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-600 text-emerald-700 dark:text-emerald-300 shadow-xs'
-                            : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-100'
-                        }`}
-                      >
-                        <LayoutDashboard className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span>Manager</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Terms & Conditions Checkbox */}
-                  <label className="flex items-start gap-2 cursor-pointer pt-1">
-                    <input
-                      id="auth-signup-terms"
-                      type="checkbox"
-                      checked={agreeTerms}
-                      onChange={(e) => setAgreeTerms(e.target.checked)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4 mt-0.5"
-                    />
-                    <span className="text-[11px] text-gray-600 dark:text-gray-400 leading-tight">
-                      I agree to the KitchenSync Restaurant Staff policy and security terms.
-                    </span>
-                  </label>
-
-                  {/* Submit Button */}
-                  <button
-                    id="auth-signup-submit-btn"
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {loading ? (
-                      <>
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        Creating Account...
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="w-4 h-4" />
-                        Create Account & Sign In
-                        <ArrowRight className="w-4 h-4 ml-auto" />
-                      </>
-                    )}
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
+            <button
+              id="auth-demo-manager-btn"
+              type="button"
+              disabled={loading}
+              onClick={() => handleQuickDemoLogin('manager')}
+              className="w-full p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 text-sm font-bold flex items-center gap-4 transition-all disabled:opacity-50"
+            >
+              <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+                <LayoutDashboard className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold">Manager Hub</p>
+                <p className="text-[11px] text-gray-500 font-normal mt-0.5">Staff & Operations Dashboard</p>
+              </div>
+            </button>
+          </div>
         </div>
       </div>
 
