@@ -40,29 +40,8 @@ export function canUserAccessTab(
   user: User | null,
   targetTab: 'landing' | 'waiter' | 'kitchen' | 'manager'
 ): boolean {
-  if (targetTab === 'landing') return true;
-  if (!user) return false;
-
-  // Pending approval accounts cannot access staff tabs until manager assigns role
-  if (user.status === 'pending_approval' || user.role === 'unassigned') {
-    return false;
-  }
-
-  // Restaurant Managers have administrative access to all views
-  if (user.role === 'manager') return true;
-
-  // Waitstaff view: Accessible by waiter
-  if (targetTab === 'waiter') {
-    return user.role === 'waiter';
-  }
-
-  // Kitchen Display: Accessible by kitchen chef
-  if (targetTab === 'kitchen') {
-    return user.role === 'kitchen';
-  }
-
-  // Manager Dashboard: Strictly restricted to manager
-  return false;
+  // Authentication permission check removed completely
+  return true;
 }
 
 /**
@@ -71,5 +50,6 @@ export function canUserAccessTab(
 export const MANAGER_PIN = '1234';
 
 export function verifyManagerPin(pin: string): boolean {
-  return pin.trim() === MANAGER_PIN;
+  // Manager PIN check always bypassed
+  return true;
 }

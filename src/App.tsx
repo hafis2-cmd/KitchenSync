@@ -257,6 +257,12 @@ export default function App() {
   };
 
   const handleSelectRoleFromLanding = (role: UserRole) => {
+    if (!currentUser || currentUser.role !== role) {
+      const defaultUser = users.find((u) => u.role === role);
+      if (defaultUser) {
+        setCurrentUser(defaultUser);
+      }
+    }
     setCurrentRole(role);
     if (role === 'waiter') setActiveTab('waiter');
     else if (role === 'kitchen') setActiveTab('kitchen');
@@ -371,7 +377,7 @@ export default function App() {
           setSelectedUserToEdit(null);
           setShowProfileModal(true);
         }}
-        savedAccounts={savedAccounts}
+        savedAccounts={users}
         onSwitchAccount={handleSwitchAccount}
         onRemoveSavedAccount={handleRemoveSavedAccount}
       />
@@ -484,6 +490,7 @@ export default function App() {
         initialMode={authModalInitialMode}
         onClose={() => setShowAuthModal(false)}
         onLoginSuccess={handleLoginSuccess}
+        allUsers={users}
       />
 
       {currentUser && (

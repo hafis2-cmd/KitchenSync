@@ -29,6 +29,7 @@ interface AuthModalProps {
   onClose: () => void;
   onLoginSuccess: (user: User, role: UserRole) => void;
   initialMode?: 'login' | 'signup';
+  allUsers?: User[];
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -36,6 +37,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   onLoginSuccess,
   initialMode = 'login',
+  allUsers = [],
 }) => {
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
 
@@ -180,26 +182,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  // Quick Demo Account Auto-Fill & Login
-  const handleQuickDemoLogin = async (role: UserRole) => {
+  // Direct User Selection Bypass Login
+  const handleUserSelect = async (user: User) => {
     setLoading(true);
     setError('');
-    const demoCredentials: Record<string, { email: string; pass: string }> = {
-      manager: { email: 'manager@kitchensync.com', pass: 'password123' },
-      waiter: { email: 'waiter@kitchensync.com', pass: 'password123' },
-      kitchen: { email: 'kitchen@kitchensync.com', pass: 'password123' },
-    };
-
-    const creds = demoCredentials[role] || demoCredentials.waiter;
-    setLoginEmail(creds.email);
-    setLoginPassword(creds.pass);
-
     try {
-      const user = await loginUser(creds.email, creds.pass, role);
-      onLoginSuccess(user, role);
+      const loggedIn = await loginUser(user.email, 'password123', user.role);
+      onLoginSuccess(loggedIn, loggedIn.role || 'waiter');
       onClose();
     } catch (err: any) {
-      setError('Demo login failed. Please try again.');
+      setError(err.message || 'Login failed.');
     } finally {
       setLoading(false);
     }
@@ -246,63 +238,84 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
         )}
 
-        {/* Modal Body: Only 1-Click Demo Accounts */}
-        <div className="p-6">
+        {/* Modal Body: Directory List for instant 1-tap login */}
+        <div className="p-6 max-h-[70vh] overflow-y-auto">
           <div className="flex items-center justify-between mb-4">
             <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-500" /> Select Demo Role
+              <Sparkles className="w-3 h-3 text-amber-500" /> Select User Profile
             </span>
-            <span className="text-[10px] text-gray-400">Instant Access</span>
+            <span className="text-[10px] text-gray-400">1-Tap Bypass Login</span>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <button
-              id="auth-demo-waiter-btn"
-              type="button"
-              disabled={loading}
-              onClick={() => handleQuickDemoLogin('waiter')}
-              className="w-full p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/80 hover:bg-blue-50 dark:hover:bg-blue-950/40 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 text-sm font-bold flex items-center gap-4 transition-all disabled:opacity-50"
-            >
-              <div className="p-2.5 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
-                <UserCheck className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <p className="font-bold">Waitstaff View</p>
-                <p className="text-[11px] text-gray-500 font-normal mt-0.5">Floor Plan & Table Orders</p>
-              </div>
-            </button>
+          <div className="flex flex-col gap-2.5">
+            {(allUsers && allUsers.length > 0 ? allUsers : [
+              {
+                id: 'u-mgr-1',
+                name: 'Alex Rivera',
+                email: 'manager@kitchensync.com',
+                role: 'manager',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200',
+                status: 'active'
+              },
+              {
+                id: 'u-wait-1',
+                name: 'Marco Silva',
+                email: 'waiter@kitchensync.com',
+                role: 'waiter',
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200',
+                status: 'active'
+              },
+              {
+                id: 'u-wait-2',
+                name: 'Elena Rostova',
+                email: 'elena@kitchensync.com',
+                role: 'waiter',
+                avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=200',
+                status: 'active'
+              },
+              {
+                id: 'u-kit-1',
+                name: 'Chef Gordon',
+                email: 'kitchen@kitchensync.com',
+                role: 'kitchen',
+                avatar: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=200',
+                status: 'active'
+              }
+            ] as User[]).map((u) => {
+              // Role label styling
+              const roleStyles: Record<string, { label: string; icon: string; bg: string; text: string }> = {
+                manager: { label: 'Manager', icon: '👑', bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-400' },
+                waiter: { label: 'Waitstaff', icon: '🍽️', bg: 'bg-blue-50 dark:bg-blue-950/40', text: 'text-blue-700 dark:text-blue-400' },
+                kitchen: { label: 'Kitchen Chef', icon: '🍳', bg: 'bg-purple-50 dark:bg-purple-950/40', text: 'text-purple-700 dark:text-purple-400' },
+                unassigned: { label: 'Pending', icon: '⏳', bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-400' }
+              };
+              const roleInfo = roleStyles[u.role] || roleStyles.unassigned;
 
-            <button
-              id="auth-demo-kitchen-btn"
-              type="button"
-              disabled={loading}
-              onClick={() => handleQuickDemoLogin('kitchen')}
-              className="w-full p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/80 hover:bg-purple-50 dark:hover:bg-purple-950/40 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 text-sm font-bold flex items-center gap-4 transition-all disabled:opacity-50"
-            >
-              <div className="p-2.5 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400">
-                <ChefHat className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <p className="font-bold">Kitchen Display (KDS)</p>
-                <p className="text-[11px] text-gray-500 font-normal mt-0.5">Active Ticket Preparation</p>
-              </div>
-            </button>
-
-            <button
-              id="auth-demo-manager-btn"
-              type="button"
-              disabled={loading}
-              onClick={() => handleQuickDemoLogin('manager')}
-              className="w-full p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/80 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-200 text-sm font-bold flex items-center gap-4 transition-all disabled:opacity-50"
-            >
-              <div className="p-2.5 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
-                <LayoutDashboard className="w-5 h-5" />
-              </div>
-              <div className="text-left">
-                <p className="font-bold">Manager Hub</p>
-                <p className="text-[11px] text-gray-500 font-normal mt-0.5">Staff & Operations Dashboard</p>
-              </div>
-            </button>
+              return (
+                <button
+                  key={u.id}
+                  id={`auth-select-user-${u.id}`}
+                  type="button"
+                  disabled={loading}
+                  onClick={() => handleUserSelect(u)}
+                  className="w-full p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/60 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 border border-gray-200 dark:border-gray-800/80 hover:border-blue-300 dark:hover:border-blue-800 text-left flex items-center gap-3.5 transition-all duration-150 disabled:opacity-50"
+                >
+                  <img
+                    src={u.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200'}
+                    alt={u.name}
+                    className="w-10 h-10 rounded-xl object-cover ring-2 ring-gray-200/50 dark:ring-gray-700/50 shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-extrabold text-sm text-gray-900 dark:text-white truncate">{u.name}</p>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{u.email}</p>
+                  </div>
+                  <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${roleInfo.bg} ${roleInfo.text} shrink-0`}>
+                    <span>{roleInfo.icon}</span>
+                    <span>{roleInfo.label}</span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

@@ -151,12 +151,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             id="navbar-tab-waiter"
-            onClick={() => {
-              if (!currentUser) onOpenAuth();
-              else {
-                setActiveTab('waiter');
-              }
-            }}
+            onClick={() => setActiveTab('waiter')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
               activeTab === 'waiter'
                 ? 'bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm ring-1 ring-black/5 dark:ring-white/10 font-bold'
@@ -165,19 +160,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <UserCheck className="w-3.5 h-3.5" />
             <span>Waitstaff</span>
-            {currentUser && !canUserAccessTab(currentUser, 'waiter') && (
-              <Lock className="w-3 h-3 text-amber-500 ml-0.5" />
-            )}
           </button>
 
           <button
             id="navbar-tab-kitchen"
-            onClick={() => {
-              if (!currentUser) onOpenAuth();
-              else {
-                setActiveTab('kitchen');
-              }
-            }}
+            onClick={() => setActiveTab('kitchen')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
               activeTab === 'kitchen'
                 ? 'bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm ring-1 ring-black/5 dark:ring-white/10 font-bold'
@@ -186,19 +173,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <ChefHat className="w-3.5 h-3.5" />
             <span>Kitchen Display</span>
-            {currentUser && !canUserAccessTab(currentUser, 'kitchen') && (
-              <Lock className="w-3 h-3 text-amber-500 ml-0.5" />
-            )}
           </button>
 
           <button
             id="navbar-tab-manager"
-            onClick={() => {
-              if (!currentUser) onOpenAuth();
-              else {
-                setActiveTab('manager');
-              }
-            }}
+            onClick={() => setActiveTab('manager')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 ${
               activeTab === 'manager'
                 ? 'bg-white dark:bg-gray-900 text-blue-600 dark:text-blue-400 shadow-sm ring-1 ring-black/5 dark:ring-white/10 font-bold'
@@ -207,9 +186,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
             <span>Manager Hub</span>
-            {currentUser && !canUserAccessTab(currentUser, 'manager') && (
-              <Lock className="w-3 h-3 text-amber-500 ml-0.5" />
-            )}
           </button>
         </nav>
 
@@ -437,7 +413,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {/* Signed-in Accounts / Switcher Section */}
                   <div className="border-t border-gray-100 dark:border-gray-800 my-1.5 pt-1.5">
                     <p className="px-3 py-1 text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center justify-between">
-                      <span>Accounts ({savedAccounts.length || 1})</span>
+                      <span>Staff Directory</span>
                       <span className="text-[9px] font-normal text-blue-600 dark:text-blue-400">1-Click Switch</span>
                     </p>
 
@@ -474,19 +450,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                                   <Check className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0 mr-1" />
                                 )}
                               </button>
-
-                              {!isCurrent && onRemoveSavedAccount && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onRemoveSavedAccount(acc.id);
-                                  }}
-                                  className="p-1 rounded-md text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
-                                  title="Remove saved account"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </button>
-                              )}
                             </div>
                           );
                         })}
@@ -539,40 +502,28 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Sub-Navigation Bar */}
       <div className="md:hidden flex border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 divide-x divide-gray-200 dark:divide-gray-800">
         <button
-          onClick={() => {
-            if (!currentUser) onOpenAuth();
-            else setActiveTab('waiter');
-          }}
+          onClick={() => setActiveTab('waiter')}
           className={`flex-1 py-2.5 text-center text-xs font-semibold flex items-center justify-center gap-1 ${
             activeTab === 'waiter' ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/30' : 'hover:text-gray-900 dark:hover:text-white'
           }`}
         >
           <UserCheck className="w-3.5 h-3.5" /> Waitstaff
-          {currentUser && !canUserAccessTab(currentUser, 'waiter') && <Lock className="w-3 h-3 text-amber-500" />}
         </button>
         <button
-          onClick={() => {
-            if (!currentUser) onOpenAuth();
-            else setActiveTab('kitchen');
-          }}
+          onClick={() => setActiveTab('kitchen')}
           className={`flex-1 py-2.5 text-center text-xs font-semibold flex items-center justify-center gap-1 ${
             activeTab === 'kitchen' ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/30' : 'hover:text-gray-900 dark:hover:text-white'
           }`}
         >
           <ChefHat className="w-3.5 h-3.5" /> Kitchen
-          {currentUser && !canUserAccessTab(currentUser, 'kitchen') && <Lock className="w-3 h-3 text-amber-500" />}
         </button>
         <button
-          onClick={() => {
-            if (!currentUser) onOpenAuth();
-            else setActiveTab('manager');
-          }}
+          onClick={() => setActiveTab('manager')}
           className={`flex-1 py-2.5 text-center text-xs font-semibold flex items-center justify-center gap-1 ${
             activeTab === 'manager' ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/30' : 'hover:text-gray-900 dark:hover:text-white'
           }`}
         >
           <LayoutDashboard className="w-3.5 h-3.5" /> Manager
-          {currentUser && !canUserAccessTab(currentUser, 'manager') && <Lock className="w-3 h-3 text-amber-500" />}
         </button>
       </div>
 

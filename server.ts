@@ -443,57 +443,21 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
   const { email, password, role } = req.body;
   
   const cleanEmail = email ? String(email).trim().toLowerCase() : '';
+  let targetEmail = cleanEmail;
   
+  if (!targetEmail && role) {
+    const demoUser = globalStore.users.find(u => u.role === role);
+    if (demoUser) targetEmail = demoUser.email;
+  }
+  
+  if (!targetEmail) {
+    return res.status(400).json({ success: false, error: 'Email ID is required.' });
+  }
+
   if (isSupabaseConfigured && supabase) {
     try {
-      // 1-click fallback logic: if role is selected but no password, we auto-fetch email
-      let targetEmail = cleanEmail;
-      if (!targetEmail && role) {
-        const demoUser = globalStore.users.find(u => u.role === role);
-        if (demoUser) targetEmail = demoUser.email;
-      }
-      
-      const targetPassword = password || 'password123';
-      
-      if (!targetEmail) {
-        return res.status(400).json({ success: false, error: 'Email ID is required.' });
-      }
-
-      // Attempt login
-      let { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
-        email: targetEmail,
-        password: targetPassword,
-      });
-
-      // Auto-signup fallback for demo users:
-      const demoUsers = ['manager@kitchensync.com', 'waiter@kitchensync.com', 'elena@kitchensync.com', 'kitchen@kitchensync.com'];
-      if (authErr && demoUsers.includes(targetEmail)) {
-        console.log(`Auto-registering demo user ${targetEmail} in Supabase Auth...`);
-        const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-          email: targetEmail,
-          password: targetPassword,
-        });
-
-        if (!signUpErr) {
-          // Retry signing in
-          const retry = await supabase.auth.signInWithPassword({
-            email: targetEmail,
-            password: targetPassword,
-          });
-          authData = retry.data;
-          authErr = retry.error;
-        }
-      }
-
-      if (authErr || !authData.user) {
-        return res.status(401).json({
-          success: false,
-          error: authErr ? authErr.message : 'Incorrect email or password.',
-        });
-      }
-
       // Check if user profile is already in memory
-      let user = globalStore.users.find((u) => u.email.toLowerCase() === targetEmail);
+      let user = globalStore.users.find((u) => u.email.toLowerCase() === targetEmail.toLowerCase());
       if (!user) {
         // Fetch from Supabase users profile table
         const { data: sbUser, error: fetchErr } = await supabase.from('users').select('*').eq('email', targetEmail).single();
@@ -502,7 +466,7 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
             id: sbUser.id,
             name: sbUser.name,
             email: sbUser.email,
-            password: sbUser.password || targetPassword,
+            password: sbUser.password || 'password123',
             role: sbUser.role,
             phone: sbUser.phone || '',
             avatar: sbUser.avatar || '',
@@ -515,14 +479,13 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
         }
       }
 
-      // If user profile doesn't exist at all, auto-create one matching the demo user profile or default values
+      // If user profile doesn't exist at all, auto-create one
       if (!user) {
-        const demoUser = globalStore.users.find(u => u.email.toLowerCase() === targetEmail);
-        user = demoUser || {
-          id: authData.user.id,
+        user = {
+          id: 'u-' + Math.random().toString(36).substr(2, 9),
           name: targetEmail.split('@')[0],
           email: targetEmail,
-          password: targetPassword,
+          password: 'password123',
           role: 'unassigned',
           status: 'pending_approval',
           assignedTables: [],
@@ -543,34 +506,23 @@ app.post('/api/auth/login', async (req: Request, res: Response) => {
     }
   }
 
-  if (!cleanEmail && role && !password) {
-    let user = globalStore.users.find((u) => u.role === role);
-    if (user) {
-      return res.json({ success: true, user });
-    }
-  }
-
-  if (!cleanEmail) {
-    return res.status(400).json({ success: false, error: 'Email ID is required.' });
-  }
-
-  let user = globalStore.users.find((u) => u.email.toLowerCase() === cleanEmail);
+  // Local in-memory fallback login
+  let user = globalStore.users.find((u) => u.email.toLowerCase() === targetEmail.toLowerCase());
 
   if (!user) {
-    return res.status(401).json({
-      success: false,
-      error: `No staff account registered with '${cleanEmail}'. Please sign up first.`,
-    });
-  }
-
-  if (password) {
-    const expectedPassword = user.password || 'password123';
-    if (password !== expectedPassword && password !== 'password123') {
-      return res.status(401).json({
-        success: false,
-        error: 'Incorrect password for this email account.',
-      });
-    }
+    // Auto-create local user if they don't exist to make traversal unrestricted
+    user = {
+      id: 'u-' + Math.random().toString(36).substr(2, 9),
+      name: targetEmail.split('@')[0],
+      email: targetEmail,
+      password: 'password123',
+      role: role || 'unassigned',
+      status: 'active',
+      assignedTables: [],
+      requestedRole: role || 'waiter',
+      joinedAt: new Date().toISOString()
+    };
+    globalStore.users.push(user);
   }
 
   res.json({ success: true, user });
