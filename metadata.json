@@ -1,0 +1,6 @@
+{
+  "name": "KitchenSync",
+  "description": "Unified Staff Coordination Hub for restaurants: real-time KDS, waitstaff order entry, floor plan management, digital menu control, and AI operational insights.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

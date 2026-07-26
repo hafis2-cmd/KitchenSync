@@ -1,0 +1,17 @@
+{
+  "short_name": "KitchenSync",
+  "name": "KitchenSync Restaurant Operations Hub",
+  "description": "AI-powered real-time restaurant waitstaff, kitchen, and manager operations dashboard.",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#030712",
+  "theme_color": "#3B82F6",
+  "display": "standalone",
+  "orientation": "any"
+}
