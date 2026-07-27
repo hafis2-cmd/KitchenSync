@@ -1,3 +1,10 @@
+Team Sayujstaji : 
+>Team Members:
+#Sayuj Staji
+#Ajishna Jaison
+#Hafis Mohammed K
+#Rahul Prakash
+
 # 🍽️ KitchenSync
 
 > **Unified Restaurant Operations Coordination Hub**  
