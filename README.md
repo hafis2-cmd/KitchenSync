@@ -1,4 +1,4 @@
-Team Sayujstaji : 
+Team sayujstaji : 
 >Team Members:
 #Sayuj Staji
 #Ajishna Jaison
