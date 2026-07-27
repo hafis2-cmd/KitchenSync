@@ -3,7 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Type } from '@google/genai';
-import { globalStore } from './src/server/store.js';
+import { globalStore, RestaurantStore } from './src/server/store.js';
 import { supabase, isSupabaseConfigured } from './src/server/supabase.js';
 
 // Persistence helpers for Supabase Write-Through cache
@@ -436,6 +436,26 @@ app.get('/api/store/state', (req: Request, res: Response) => {
     shiftNotes: globalStore.shiftNotes,
     shifts: globalStore.shifts,
   });
+});
+
+app.post('/api/store/reset', (req: Request, res: Response) => {
+  try {
+    const newStore = new RestaurantStore();
+    globalStore.users = newStore.users;
+    globalStore.menuItems = newStore.menuItems;
+    globalStore.tables = newStore.tables;
+    globalStore.orders = newStore.orders;
+    globalStore.inventory = newStore.inventory;
+    globalStore.notifications = newStore.notifications;
+    globalStore.bills = newStore.bills;
+    globalStore.shiftNotes = newStore.shiftNotes;
+    globalStore.shifts = newStore.shifts;
+
+    broadcastStateUpdate('store_reset');
+    res.json({ success: true });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || 'Failed to reset store' });
+  }
 });
 
 // Authentication & Email + Password Sign-up Endpoints

@@ -310,3 +310,11 @@ export async function updateTableCustomNote(id: string, note: string): Promise<R
   const data = await res.json();
   return data.table;
 }
+
+export async function resetAppState(): Promise<void> {
+  const res = await fetch('/api/store/reset', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) throw new Error('Failed to reset app state');
+}

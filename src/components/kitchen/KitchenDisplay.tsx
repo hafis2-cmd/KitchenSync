@@ -181,7 +181,7 @@ export const KitchenDisplay: React.FC<KitchenDisplayProps> = ({ currentUser, ord
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             {Object.entries(stationCounts).map(([stationName, data]) => {
               const IconComp = data.icon;
               const isHeavy = data.count >= 6;
@@ -417,7 +417,7 @@ export const KitchenDisplay: React.FC<KitchenDisplayProps> = ({ currentUser, ord
             <span className="text-xs text-gray-500">{shiftNotes.length} notes posted</span>
           </div>
 
-          <form onSubmit={handlePostNote} className="flex gap-2">
+          <form onSubmit={handlePostNote} className="flex flex-col sm:flex-row gap-2">
             <input
               id="kitchen-note-input"
               type="text"

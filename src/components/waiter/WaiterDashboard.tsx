@@ -57,6 +57,7 @@ export const WaiterDashboard: React.FC<WaiterDashboardProps> = ({
   const [cartItems, setCartItems] = useState<{ menuItem: MenuItem; quantity: number; notes: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [orderModalTab, setOrderModalTab] = useState<'menu' | 'cart'>('menu');
 
   // Voice Recognition State
   const [showVoiceModal, setShowVoiceModal] = useState(false);
@@ -599,8 +600,40 @@ export const WaiterDashboard: React.FC<WaiterDashboardProps> = ({
         {showOrderModal && selectedTable && (
           <div className="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
             <div className="relative w-full max-w-4xl bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+              
+              {/* Mobile Order Tab Toggle */}
+              <div className="flex border-b border-gray-200 md:hidden bg-gray-50 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setOrderModalTab('menu')}
+                  className={`flex-1 py-3 text-center text-xs font-bold transition-all ${
+                    orderModalTab === 'menu'
+                      ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Browse Menu
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderModalTab('cart')}
+                  className={`flex-1 py-3 text-center text-xs font-bold transition-all relative ${
+                    orderModalTab === 'cart'
+                      ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Order Cart ({cartItems.length})
+                  {cartItems.length > 0 && (
+                    <span className="absolute top-2.5 right-4 w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
+                  )}
+                </button>
+              </div>
+
               {/* Left Menu Selection Column */}
-              <div className="flex-1 p-5 sm:p-6 overflow-y-auto border-b md:border-b-0 md:border-r border-gray-200 space-y-4">
+              <div className={`flex-1 p-5 sm:p-6 overflow-y-auto border-b md:border-b-0 md:border-r border-gray-200 space-y-4 ${
+                orderModalTab === 'menu' ? 'block' : 'hidden md:block'
+              }`}>
                 <div className="flex items-center justify-between gap-2">
                   <h2 className="text-lg font-bold text-gray-900">Select Dishes for Table #{selectedTable.tableNumber}</h2>
                   <div className="flex items-center gap-2">
@@ -690,7 +723,9 @@ export const WaiterDashboard: React.FC<WaiterDashboardProps> = ({
               </div>
 
               {/* Right Order Summary & Voice Column */}
-              <div className="w-full md:w-96 p-5 sm:p-6 bg-gray-50 flex flex-col justify-between space-y-4">
+              <div className={`w-full md:w-96 p-5 sm:p-6 bg-gray-50 flex flex-col justify-between space-y-4 ${
+                orderModalTab === 'cart' ? 'flex' : 'hidden md:flex'
+              }`}>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-gray-200 pb-3">
                     <div>

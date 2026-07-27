@@ -1,0 +1,109 @@
+# KitchenSync REST API Examples
+#
+# Use this file with the VS Code REST Client extension (or raw http tooling)
+# to execute and test the KitchenSync backend endpoints locally.
+#
+
+@baseUrl = http://localhost:3000
+
+### 1. Fetch Complete Restaurant State
+# Returns all active tables, inventory, shifts, notifications, and orders.
+GET {{baseUrl}}/api/store/state
+Accept: application/json
+
+###
+
+### 2. Reset App State to Baseline Defaults
+# Clears active orders, resets table statuses, and restores default stock levels.
+POST {{baseUrl}}/api/store/reset
+Content-Type: application/json
+
+{}
+
+###
+
+### 3. Seat Table 9 (Set to Occupied)
+# Sets the status of Table 9 to "Occupied" and assigns it to waiter Marco Silva.
+PUT {{baseUrl}}/api/tables/t-9
+Content-Type: application/json
+
+{
+  "status": "Occupied",
+  "assignedWaiterId": "u-wait-1"
+}
+
+###
+
+### 4. Create and Submit a New Order
+# Places a food order ticket for Table 9.
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+
+{
+  "tableId": "t-9",
+  "tableNumber": 9,
+  "waiterId": "u-wait-1",
+  "waiterName": "Marco Silva",
+  "guestCount": 2,
+  "customerName": "John Doe",
+  "kitchenNotes": "Allergens: None. Dressing on the side please.",
+  "items": [
+    {
+      "menuItemId": "m-3",
+      "menuItemName": "Wagyu Beef Burger",
+      "quantity": 2,
+      "unitPrice": 26,
+      "notes": "Medium rare"
+    },
+    {
+      "menuItemId": "m-1",
+      "menuItemName": "Truffle Parmesan Fries",
+      "quantity": 1,
+      "unitPrice": 14,
+      "notes": "Extra crispy"
+    }
+  ]
+}
+
+###
+
+### 5. Post Handover Shift Note
+# Submits a kitchen note visible on the KDS system.
+POST {{baseUrl}}/api/shift-notes
+Content-Type: application/json
+
+{
+  "authorName": "Elena Rostova",
+  "role": "waiter",
+  "note": "We ran out of dessert spoons. Need to fetch clean ones from inventory.",
+  "priority": "normal"
+}
+
+###
+
+### 6. Trigger Low Stock Level for Truffle Oil
+# Modifies stockQty for Truffle Oil (inv-2) below threshold to trigger alert.
+PUT {{baseUrl}}/api/inventory/inv-2
+Content-Type: application/json
+
+{
+  "stockQty": 1.1
+}
+
+###
+
+### 7. Generate AI Operational Insights
+# Triggers Gemini API model parsing for analytics forecasting.
+POST {{baseUrl}}/api/ai/insights
+Content-Type: application/json
+
+{}
+
+###
+
+### 8. Generate AI Optimal Shift Staff Schedule
+# Triggers Gemini API model optimization for staff scheduling shift recommendations.
+POST {{baseUrl}}/api/ai/scheduler
+Content-Type: application/json
+
+{}
