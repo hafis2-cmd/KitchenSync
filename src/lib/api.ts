@@ -13,7 +13,7 @@ import {
   UserRole
 } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || '';
+const API_URL = import.meta.env.VITE_API_URL || 'https://kitchensync-xxnc.onrender.com';
 
 // Redirect relative api fetches to base backend host in production/cross-origin mode
 if (typeof window !== 'undefined') {

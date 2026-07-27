@@ -486,7 +486,7 @@ export default function App() {
       });
 
     // SSE EventSource for Real-Time Multi-Client Sync
-    const API_URL = import.meta.env.VITE_API_URL || '';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://kitchensync-xxnc.onrender.com';
     const eventSource = new EventSource(`${API_URL}/api/events/stream`);
 
     eventSource.onopen = () => {
