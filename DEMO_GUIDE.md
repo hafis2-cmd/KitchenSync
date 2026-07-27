@@ -75,3 +75,34 @@ You can trigger three pre-packaged multi-role scenarios:
 
 ### 🔄 Resetting the Sandbox
 Click the **"Reset Sandbox to Clean Defaults"** button at the bottom of the drawer at any time. This will clear the temporary state and revert the tables, inventory levels, and order histories to default baselines.
+
+---
+
+## 💻 Programmatic Role-Specific Demos
+
+If you prefer testing the system via the command line or simulating workflows programmatically, we have created three role-specific Node.js example clients inside the `examples/` directory.
+
+### 1. Waitstaff Simulation
+* **Script**: [waitstaff_demo.js](file:///c:/Users/hafis/OneDrive/Documents/GitHub/kitchensyn/examples/waitstaff_demo.js)
+* **What it does**: Establishes an SSE event listener, resets the store, seats Table 9, attaches a custom VIP note, and submits an order for a *Wagyu Beef Burger* and *Mint Mojito*.
+* **Run command**:
+  ```bash
+  node examples/waitstaff_demo.js
+  ```
+
+### 2. Kitchen KDS Simulation
+* **Script**: [kitchen_demo.js](file:///c:/Users/hafis/OneDrive/Documents/GitHub/kitchensyn/examples/kitchen_demo.js)
+* **What it does**: Listens to kitchen event updates. Checks for active tickets (creating a mock ticket if empty), sets the ticket to "preparing", updates individual item statuses, marks the order as "ready" (which triggers waitstaff alerts), and posts a kitchen shift note.
+* **Run command**:
+  ```bash
+  node examples/kitchen_demo.js
+  ```
+
+### 3. Manager Command Center Simulation
+* **Script**: [manager_demo.js](file:///c:/Users/hafis/OneDrive/Documents/GitHub/kitchensyn/examples/manager_demo.js)
+* **What it does**: Listens for sales and inventory updates. Bills and pays a ready order (clearing the table back to "Needs Cleaning"), sets Truffle Oil below threshold to trigger alert warnings, and queries the Gemini API for operational insights and staffing shift schedules.
+* **Run command**:
+  ```bash
+  node examples/manager_demo.js
+  ```
+
