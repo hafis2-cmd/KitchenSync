@@ -40,8 +40,15 @@ export function canUserAccessTab(
   user: User | null,
   targetTab: 'landing' | 'waiter' | 'kitchen' | 'manager'
 ): boolean {
-  // Authentication permission check removed completely
-  return true;
+  if (targetTab === 'landing') return true;
+  if (!user) return false;
+  if (user.status === 'pending_approval' || user.role === 'unassigned') return false;
+
+  if (user.role === 'manager') return true;
+  if (user.role === 'waiter') return targetTab === 'waiter';
+  if (user.role === 'kitchen') return targetTab === 'kitchen';
+
+  return false;
 }
 
 /**
@@ -50,6 +57,6 @@ export function canUserAccessTab(
 export const MANAGER_PIN = '1234';
 
 export function verifyManagerPin(pin: string): boolean {
-  // Manager PIN check always bypassed
-  return true;
+  return pin.trim() === MANAGER_PIN;
 }
+

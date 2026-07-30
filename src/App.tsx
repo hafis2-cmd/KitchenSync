@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { Navbar } from './components/Navbar';
 import { LandingPage } from './components/LandingPage';
 import { AuthModal } from './components/AuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
-import { WaiterDashboard } from './components/waiter/WaiterDashboard';
-import { KitchenDisplay } from './components/kitchen/KitchenDisplay';
-import { ManagerDashboard } from './components/manager/ManagerDashboard';
 import { UnauthorizedAccess } from './components/UnauthorizedAccess';
 import { PendingApprovalView } from './components/PendingApprovalView';
 import { canUserAccessTab } from './lib/authPermissions';
+
+const WaiterDashboard = lazy(() => import('./components/waiter/WaiterDashboard').then(m => ({ default: m.WaiterDashboard })));
+const KitchenDisplay = lazy(() => import('./components/kitchen/KitchenDisplay').then(m => ({ default: m.KitchenDisplay })));
+const ManagerDashboard = lazy(() => import('./components/manager/ManagerDashboard').then(m => ({ default: m.ManagerDashboard })));
 import {
   User,
   UserRole,
@@ -32,7 +33,9 @@ import {
   updateInventoryStock,
   generateAndPayBill,
   createStaffUser,
-  resetAppState
+  resetAppState,
+  getStoredAuthUser,
+  setStoredAuthUser,
 } from './lib/api';
 
 export default function App() {
@@ -458,6 +461,11 @@ export default function App() {
 
   // Initial State Fetch & SSE EventSource Subscription
   useEffect(() => {
+    const stored = getStoredAuthUser();
+    const loginPromise = stored
+      ? Promise.resolve(stored)
+      : loginUser('waiter@kitchensync.com', 'password123', 'waiter');
+
     // Initial REST State Load & Login
     Promise.all([
       fetchAppState()
@@ -472,10 +480,12 @@ export default function App() {
           setShifts(data.shifts || []);
           setShiftNotes(data.shiftNotes || []);
         }),
-      loginUser('waiter@kitchensync.com', 'waiter')
+      loginPromise
         .then((user) => {
           setCurrentUser(user);
-          setCurrentRole('waiter');
+          const activeRole = user.role && user.role !== 'unassigned' ? user.role : 'waiter';
+          setCurrentRole(activeRole);
+          setStoredAuthUser(user);
         })
         .catch((e) => console.warn('Demo login failed:', e))
     ])
@@ -530,6 +540,7 @@ export default function App() {
   const handleLoginSuccess = (user: User, role: UserRole) => {
     setCurrentUser(user);
     setCurrentRole(role);
+    setStoredAuthUser(user);
     setSavedAccounts((prev) => {
       const exists = prev.find((u) => u.id === user.id || u.email.toLowerCase() === user.email.toLowerCase());
       if (exists) {
@@ -546,6 +557,7 @@ export default function App() {
     setCurrentUser(user);
     const targetRole = user.role && user.role !== 'unassigned' ? user.role : 'waiter';
     setCurrentRole(targetRole);
+    setStoredAuthUser(user);
     if (targetRole === 'waiter') setActiveTab('waiter');
     else if (targetRole === 'kitchen') setActiveTab('kitchen');
     else if (targetRole === 'manager') setActiveTab('manager');
@@ -568,6 +580,7 @@ export default function App() {
       const defaultUser = users.find((u) => u.role === role);
       if (defaultUser) {
         setCurrentUser(defaultUser);
+        setStoredAuthUser(defaultUser);
       }
     }
     setCurrentRole(role);
@@ -579,6 +592,7 @@ export default function App() {
   const handleLogout = () => {
     setCurrentUser(null);
     setCurrentRole(null);
+    setStoredAuthUser(null);
     setActiveTab('landing');
   };
 
@@ -690,106 +704,115 @@ export default function App() {
       />
 
       <main className="flex-1">
-        {activeTab === 'landing' && (
-          <LandingPage
-            onSelectRole={handleSelectRoleFromLanding}
-            onOpenAuth={() => handleOpenAuthModal('login')}
-          />
-        )}
+        <Suspense fallback={
+          <div className="flex items-center justify-center p-12 min-h-[50vh]">
+            <div className="flex flex-col items-center gap-3 text-gray-500 dark:text-gray-400">
+              <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+              <span className="text-xs font-bold uppercase tracking-wider">Loading Workspace View...</span>
+            </div>
+          </div>
+        }>
+          {activeTab === 'landing' && (
+            <LandingPage
+              onSelectRole={handleSelectRoleFromLanding}
+              onOpenAuth={() => handleOpenAuthModal('login')}
+            />
+          )}
 
-        {activeTab === 'waiter' && (
-          !canUserAccessTab(currentUser, 'waiter') ? (
-            currentUser?.status === 'pending_approval' || currentUser?.role === 'unassigned' ? (
-              <PendingApprovalView
-                currentUser={currentUser}
-                onRefreshUser={handleRefreshData}
-                onOpenAuth={() => handleOpenAuthModal('login')}
-                onElevateToManager={handleElevateToManager}
-              />
+          {activeTab === 'waiter' && (
+            !canUserAccessTab(currentUser, 'waiter') ? (
+              currentUser?.status === 'pending_approval' || currentUser?.role === 'unassigned' ? (
+                <PendingApprovalView
+                  currentUser={currentUser}
+                  onRefreshUser={handleRefreshData}
+                  onOpenAuth={() => handleOpenAuthModal('login')}
+                  onElevateToManager={handleElevateToManager}
+                />
+              ) : (
+                <UnauthorizedAccess
+                  targetTab="waiter"
+                  currentUser={currentUser}
+                  onReturnToAllowedView={handleReturnToAllowedView}
+                  onOpenAuth={() => handleOpenAuthModal('login')}
+                  onElevateToManager={handleElevateToManager}
+                />
+              )
             ) : (
-              <UnauthorizedAccess
-                targetTab="waiter"
+              <WaiterDashboard
                 currentUser={currentUser}
-                onReturnToAllowedView={handleReturnToAllowedView}
-                onOpenAuth={() => handleOpenAuthModal('login')}
-                onElevateToManager={handleElevateToManager}
+                tables={tables}
+                menuItems={menuItems}
+                orders={orders}
+                bills={bills}
               />
             )
-          ) : (
-            <WaiterDashboard
-              currentUser={currentUser}
-              tables={tables}
-              menuItems={menuItems}
-              orders={orders}
-              bills={bills}
-            />
-          )
-        )}
+          )}
 
-        {activeTab === 'kitchen' && (
-          !canUserAccessTab(currentUser, 'kitchen') ? (
-            currentUser?.status === 'pending_approval' || currentUser?.role === 'unassigned' ? (
-              <PendingApprovalView
-                currentUser={currentUser}
-                onRefreshUser={handleRefreshData}
-                onOpenAuth={() => handleOpenAuthModal('login')}
-                onElevateToManager={handleElevateToManager}
-              />
+          {activeTab === 'kitchen' && (
+            !canUserAccessTab(currentUser, 'kitchen') ? (
+              currentUser?.status === 'pending_approval' || currentUser?.role === 'unassigned' ? (
+                <PendingApprovalView
+                  currentUser={currentUser}
+                  onRefreshUser={handleRefreshData}
+                  onOpenAuth={() => handleOpenAuthModal('login')}
+                  onElevateToManager={handleElevateToManager}
+                />
+              ) : (
+                <UnauthorizedAccess
+                  targetTab="kitchen"
+                  currentUser={currentUser}
+                  onReturnToAllowedView={handleReturnToAllowedView}
+                  onOpenAuth={() => handleOpenAuthModal('login')}
+                  onElevateToManager={handleElevateToManager}
+                />
+              )
             ) : (
-              <UnauthorizedAccess
-                targetTab="kitchen"
+              <KitchenDisplay
                 currentUser={currentUser}
-                onReturnToAllowedView={handleReturnToAllowedView}
-                onOpenAuth={() => handleOpenAuthModal('login')}
-                onElevateToManager={handleElevateToManager}
+                orders={orders}
+                shiftNotes={shiftNotes}
+                inventory={inventory}
               />
             )
-          ) : (
-            <KitchenDisplay
-              currentUser={currentUser}
-              orders={orders}
-              shiftNotes={shiftNotes}
-              inventory={inventory}
-            />
-          )
-        )}
+          )}
 
-        {activeTab === 'manager' && (
-          !canUserAccessTab(currentUser, 'manager') ? (
-            currentUser?.status === 'pending_approval' || currentUser?.role === 'unassigned' ? (
-              <PendingApprovalView
-                currentUser={currentUser}
-                onRefreshUser={handleRefreshData}
-                onOpenAuth={() => handleOpenAuthModal('login')}
-                onElevateToManager={handleElevateToManager}
-              />
+          {activeTab === 'manager' && (
+            !canUserAccessTab(currentUser, 'manager') ? (
+              currentUser?.status === 'pending_approval' || currentUser?.role === 'unassigned' ? (
+                <PendingApprovalView
+                  currentUser={currentUser}
+                  onRefreshUser={handleRefreshData}
+                  onOpenAuth={() => handleOpenAuthModal('login')}
+                  onElevateToManager={handleElevateToManager}
+                />
+              ) : (
+                <UnauthorizedAccess
+                  targetTab="manager"
+                  currentUser={currentUser}
+                  onReturnToAllowedView={handleReturnToAllowedView}
+                  onOpenAuth={() => handleOpenAuthModal('login')}
+                  onElevateToManager={handleElevateToManager}
+                />
+              )
             ) : (
-              <UnauthorizedAccess
-                targetTab="manager"
+              <ManagerDashboard
                 currentUser={currentUser}
-                onReturnToAllowedView={handleReturnToAllowedView}
-                onOpenAuth={() => handleOpenAuthModal('login')}
-                onElevateToManager={handleElevateToManager}
+                users={users}
+                menuItems={menuItems}
+                tables={tables}
+                orders={orders}
+                inventory={inventory}
+                bills={bills}
+                shifts={shifts}
+                shiftNotes={shiftNotes}
+                onEditUserProfile={(user) => {
+                  setSelectedUserToEdit(user);
+                  setShowProfileModal(true);
+                }}
               />
             )
-          ) : (
-            <ManagerDashboard
-              currentUser={currentUser}
-              users={users}
-              menuItems={menuItems}
-              tables={tables}
-              orders={orders}
-              inventory={inventory}
-              bills={bills}
-              shifts={shifts}
-              shiftNotes={shiftNotes}
-              onEditUserProfile={(user) => {
-                setSelectedUserToEdit(user);
-                setShowProfileModal(true);
-              }}
-            />
-          )
-        )}
+          )}
+        </Suspense>
       </main>
 
       <AuthModal

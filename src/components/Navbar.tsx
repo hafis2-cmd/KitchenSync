@@ -486,15 +486,24 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
           ) : (
-            <button
-              id="navbar-signin-btn"
-              onClick={() => onOpenAuth('login')}
-              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md shadow-blue-500/10 flex items-center gap-1.5 cursor-pointer"
-            >
-              <UserIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">Staff Sign In</span>
-              <span className="sm:hidden">Sign In</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                id="navbar-signin-btn"
+                onClick={() => onOpenAuth('login')}
+                className="px-3.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer border border-gray-200 dark:border-gray-700"
+              >
+                <UserIcon className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Log In</span>
+              </button>
+              <button
+                id="navbar-signup-btn"
+                onClick={() => onOpenAuth('signup')}
+                className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md shadow-blue-500/20 flex items-center gap-1.5 cursor-pointer"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Sign Up</span>
+              </button>
+            </div>
           )}
         </div>
       </div>

@@ -38,6 +38,27 @@ export interface AppState {
   shifts: StaffShift[];
 }
 
+export function getStoredAuthUser(): User | null {
+  try {
+    const item = localStorage.getItem('kitchensync_active_user');
+    return item ? JSON.parse(item) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function setStoredAuthUser(user: User | null): void {
+  try {
+    if (user) {
+      localStorage.setItem('kitchensync_active_user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('kitchensync_active_user');
+    }
+  } catch (e) {
+    console.error('Failed to store auth user:', e);
+  }
+}
+
 export async function fetchAppState(): Promise<AppState> {
   const res = await fetch('/api/store/state');
   if (!res.ok) throw new Error('Failed to fetch app state');
