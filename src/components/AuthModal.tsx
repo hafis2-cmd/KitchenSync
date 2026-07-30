@@ -205,26 +205,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-950/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="relative w-full max-w-md max-h-[92vh] overflow-y-auto bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-2xl transition-all text-gray-900 dark:text-gray-100 my-auto">
+    <div className="fixed inset-0 z-50 bg-gray-950/70 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fade-in">
+      <div className="relative w-full max-w-md max-h-[90vh] flex flex-col bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-3xl shadow-2xl overflow-hidden transition-all text-gray-900 dark:text-gray-100 my-auto">
         
         {/* Top Header Decorative Banner */}
-        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-6 text-white relative">
+        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4 sm:p-6 text-white relative shrink-0">
           <button
             id="auth-close-btn"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white transition-all flex items-center justify-center"
             title="Close modal"
           >
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-2.5 mb-3">
-            <div className="p-2 rounded-xl bg-white/15 backdrop-blur-md border border-white/20">
-              <ShieldCheck className="w-6 h-6 text-white" />
+          <div className="flex items-center gap-2.5 mb-3 pr-8">
+            <div className="p-2 rounded-xl bg-white/15 backdrop-blur-md border border-white/20 shrink-0">
+              <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-black tracking-tight leading-none">KitchenSync Auth Portal</h2>
+              <h2 className="text-lg sm:text-xl font-black tracking-tight leading-none">KitchenSync Auth Portal</h2>
               <p className="text-[11px] text-blue-100 font-medium mt-0.5">Unified Multi-Role Restaurant Operations</p>
             </div>
           </div>
@@ -234,37 +234,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <button
               type="button"
               onClick={() => { setActiveTab('login'); setError(''); }}
-              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+              className={`py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all min-h-[38px] ${
                 activeTab === 'login'
                   ? 'bg-white text-blue-950 shadow-md font-black'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
-              <LogIn className="w-3.5 h-3.5" />
+              <LogIn className="w-4 h-4" />
               <span>Log In</span>
             </button>
             <button
               type="button"
               onClick={() => { setActiveTab('signup'); setError(''); }}
-              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+              className={`py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all min-h-[38px] ${
                 activeTab === 'signup'
                   ? 'bg-white text-blue-950 shadow-md font-black'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
-              <UserPlus className="w-3.5 h-3.5" />
+              <UserPlus className="w-4 h-4" />
               <span>Sign Up</span>
             </button>
             <button
               type="button"
               onClick={() => { setActiveTab('demo'); setError(''); }}
-              className={`py-1.5 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+              className={`py-2 rounded-lg flex items-center justify-center gap-1.5 transition-all min-h-[38px] ${
                 activeTab === 'demo'
                   ? 'bg-white text-blue-950 shadow-md font-black'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
-              <Users className="w-3.5 h-3.5 text-amber-500" />
+              <Users className="w-4 h-4 text-amber-500" />
               <span>Demo</span>
             </button>
           </div>
@@ -272,14 +272,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Error Message Banner */}
         {error && (
-          <div className="mx-6 mt-4 p-3.5 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-fadeIn">
+          <div className="mx-4 sm:mx-6 mt-3 p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-fadeIn shrink-0">
             <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
             <p className="font-medium">{error}</p>
           </div>
         )}
 
         {/* Modal Body */}
-        <div className="p-6 max-h-[70vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-4">
 
           {/* TAB 1: LOG IN */}
           {activeTab === 'login' && (
@@ -289,15 +289,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   Work Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
+                  <Mail className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" />
                   <input
                     id="auth-login-email"
                     type="email"
                     required
+                    autoComplete="email"
+                    inputMode="email"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     placeholder="waiter@kitchensync.com"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-base sm:text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                   />
                 </div>
               </div>
@@ -310,26 +312,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowForgotPassword(true)}
-                    className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline py-1"
                   >
                     Forgot Password?
                   </button>
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
+                  <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" />
                   <input
                     id="auth-login-password"
                     type={showLoginPassword ? 'text' : 'password'}
                     required
+                    autoComplete="current-password"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-11 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-base sm:text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                   />
                   <button
                     type="button"
                     onClick={() => setShowLoginPassword(!showLoginPassword)}
-                    className="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                    className="absolute right-1 top-1 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                   >
                     {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -345,7 +348,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 id="auth-login-submit-btn"
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
+                className="w-full py-3.5 sm:py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold text-sm sm:text-xs transition-all shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 disabled:opacity-50 min-h-[44px]"
               >
                 {loading ? (
                   <>
@@ -380,36 +383,39 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <form onSubmit={handleSignUpSubmit} className="space-y-3.5">
                   <div>
                     <label className="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">
-                      Full Name
+                      Full Name *
                     </label>
                     <div className="relative">
-                      <UserIcon className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
+                      <UserIcon className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" />
                       <input
                         id="auth-signup-name"
                         type="text"
                         required
+                        autoComplete="name"
                         value={signUpName}
                         onChange={(e) => setSignUpName(e.target.value)}
                         placeholder="John Doe"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-base sm:text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                       />
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">
-                      Work Email ID
+                      Work Email ID *
                     </label>
                     <div className="relative">
-                      <Mail className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
+                      <Mail className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" />
                       <input
                         id="auth-signup-email"
                         type="email"
                         required
+                        autoComplete="email"
+                        inputMode="email"
                         value={signUpEmail}
                         onChange={(e) => setSignUpEmail(e.target.value)}
                         placeholder="john.doe@kitchensync.com"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-base sm:text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                       />
                     </div>
                   </div>
@@ -418,36 +424,38 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">
-                        Password
+                        Password *
                       </label>
                       <div className="relative">
-                        <Lock className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
+                        <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" />
                         <input
                           id="auth-signup-password"
                           type={showSignUpPassword ? 'text' : 'password'}
                           required
+                          autoComplete="new-password"
                           value={signUpPassword}
                           onChange={(e) => setSignUpPassword(e.target.value)}
                           placeholder="Min 4 chars"
-                          className="w-full pl-10 pr-8 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full pl-10 pr-10 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-base sm:text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                         />
                       </div>
                     </div>
 
                     <div>
                       <label className="block text-xs font-bold mb-1 text-gray-700 dark:text-gray-300">
-                        Confirm Password
+                        Confirm Password *
                       </label>
                       <div className="relative">
-                        <Lock className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
+                        <Lock className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" />
                         <input
                           id="auth-signup-confirm-password"
                           type="password"
                           required
+                          autoComplete="new-password"
                           value={signUpConfirmPassword}
                           onChange={(e) => setSignUpConfirmPassword(e.target.value)}
                           placeholder="Re-enter password"
-                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-base sm:text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                         />
                       </div>
                     </div>
@@ -476,14 +484,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         Phone (Optional)
                       </label>
                       <div className="relative">
-                        <Phone className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
+                        <Phone className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-400 pointer-events-none" />
                         <input
                           id="auth-signup-phone"
                           type="tel"
+                          inputMode="tel"
                           value={signUpPhone}
                           onChange={(e) => setSignUpPhone(e.target.value)}
                           placeholder="+1 (555) 000-0000"
-                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full pl-10 pr-4 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-base sm:text-xs text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                         />
                       </div>
                     </div>
@@ -496,7 +505,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                         id="auth-signup-role"
                         value={requestedRole}
                         onChange={(e) => setRequestedRole(e.target.value as UserRole)}
-                        className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-base sm:text-xs text-gray-900 dark:text-white font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                       >
                         <option value="waiter">🍽️ Waitstaff (Floor & Tables)</option>
                         <option value="kitchen">🍳 Kitchen Chef (Display & Prep)</option>
