@@ -510,30 +510,27 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Sub-Navigation Bar */}
       <div className="md:hidden flex border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-gray-600 dark:text-gray-300 divide-x divide-gray-200 dark:divide-gray-800">
-        <button
-          onClick={() => setActiveTab('waiter')}
-          className={`flex-1 py-2.5 text-center text-xs font-semibold flex items-center justify-center gap-1 ${
-            activeTab === 'waiter' ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/30' : 'hover:text-gray-900 dark:hover:text-white'
-          }`}
-        >
-          <UserCheck className="w-3.5 h-3.5" /> Waitstaff
-        </button>
-        <button
-          onClick={() => setActiveTab('kitchen')}
-          className={`flex-1 py-2.5 text-center text-xs font-semibold flex items-center justify-center gap-1 ${
-            activeTab === 'kitchen' ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/30' : 'hover:text-gray-900 dark:hover:text-white'
-          }`}
-        >
-          <ChefHat className="w-3.5 h-3.5" /> Kitchen
-        </button>
-        <button
-          onClick={() => setActiveTab('manager')}
-          className={`flex-1 py-2.5 text-center text-xs font-semibold flex items-center justify-center gap-1 ${
-            activeTab === 'manager' ? 'text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/30' : 'hover:text-gray-900 dark:hover:text-white'
-          }`}
-        >
-          <LayoutDashboard className="w-3.5 h-3.5" /> Manager
-        </button>
+        {(['waiter', 'kitchen', 'manager'] as const).map((tabKey) => {
+          const tabAllowed = canUserAccessTab(currentUser, tabKey);
+          const IconComp = tabKey === 'waiter' ? UserCheck : tabKey === 'kitchen' ? ChefHat : LayoutDashboard;
+          const label = tabKey === 'waiter' ? 'Waitstaff' : tabKey === 'kitchen' ? 'Kitchen' : 'Manager';
+
+          return (
+            <button
+              key={tabKey}
+              onClick={() => setActiveTab(tabKey)}
+              className={`flex-1 py-3 text-center text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
+                activeTab === tabKey
+                  ? 'text-blue-600 dark:text-blue-400 bg-blue-50/60 dark:bg-blue-950/40 border-b-2 border-blue-600'
+                  : 'hover:text-gray-900 dark:hover:text-white'
+              }`}
+            >
+              <IconComp className="w-4 h-4" />
+              <span>{label}</span>
+              {!tabAllowed && <Lock className="w-3 h-3 text-amber-500 shrink-0" />}
+            </button>
+          );
+        })}
       </div>
 
     </header>
