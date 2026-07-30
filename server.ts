@@ -610,15 +610,12 @@ app.post('/api/auth/signup', async (req: Request, res: Response) => {
       });
 
       if (authErr) {
-        return res.status(400).json({ success: false, error: authErr.message });
-      }
-
-      if (authData.user) {
+        console.warn('Supabase Auth signUp notice (proceeding with local store profile):', authErr.message);
+      } else if (authData.user) {
         newUser.id = authData.user.id;
       }
     } catch (e: any) {
-      console.error('Supabase Sign Up Auth Error:', e);
-      return res.status(500).json({ success: false, error: e.message || 'Auth registration error' });
+      console.warn('Supabase Auth error during registration:', e);
     }
   }
 
