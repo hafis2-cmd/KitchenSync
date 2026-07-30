@@ -25,6 +25,8 @@ import {
   MessageSquare
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { RestaurantTable, MenuItem, Order, Bill, User, TableStatus, MenuCategory } from '../../types';
 import { createOrder, updateTableStatus, updateOrderItemStatus, generateAndPayBill } from '../../lib/api';
 import { TableQRModal } from '../TableQRModal';
@@ -221,6 +223,62 @@ export const WaiterDashboard: React.FC<WaiterDashboardProps> = ({
       alert('Failed to process payment');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Export PDF Receipt
+  const handleExportPdfReceipt = () => {
+    if (!billingOrder) return;
+    try {
+      const doc = new jsPDF();
+
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('KitchenSync Bistro', 105, 18, { align: 'center' });
+
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Unified Restaurant Receipt', 105, 25, { align: 'center' });
+      doc.text(`Receipt Date: ${new Date().toLocaleString()}`, 105, 31, { align: 'center' });
+
+      doc.text(`Table #: ${billingOrder.tableNumber}`, 14, 42);
+      doc.text(`Order ID: ${billingOrder.id}`, 14, 48);
+      doc.text(`Customer: ${billingOrder.customerName || 'Walk-in Guest'}`, 14, 54);
+      doc.text(`Payment Method: ${paymentMethod.toUpperCase()}`, 14, 60);
+
+      const tableData = (billingOrder.items || []).map((item) => [
+        item.menuItemName,
+        `${item.quantity}`,
+        `$${item.unitPrice.toFixed(2)}`,
+        `$${(item.unitPrice * item.quantity).toFixed(2)}`
+      ]);
+
+      autoTable(doc, {
+        startY: 66,
+        head: [['Item Name', 'Qty', 'Unit Price', 'Total']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [37, 99, 235] },
+      });
+
+      const finalY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 10 : 120;
+      const sub = billingOrder.totalAmount;
+      const tax = Math.round(sub * 0.1 * 100) / 100;
+      const grandTotal = Math.max(0, sub + tax - discountAmount);
+
+      doc.text(`Subtotal: $${sub.toFixed(2)}`, 140, finalY);
+      doc.text(`Tax (10%): $${tax.toFixed(2)}`, 140, finalY + 6);
+      if (discountAmount > 0) {
+        doc.text(`Discount: -$${discountAmount.toFixed(2)}`, 140, finalY + 12);
+      }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text(`Grand Total: $${grandTotal.toFixed(2)}`, 140, finalY + (discountAmount > 0 ? 20 : 14));
+
+      doc.save(`Receipt_Table_${billingOrder.tableNumber}_${billingOrder.id}.pdf`);
+    } catch (e) {
+      console.error('Failed to export PDF receipt:', e);
+      alert('Could not export PDF receipt');
     }
   };
 
@@ -972,15 +1030,26 @@ export const WaiterDashboard: React.FC<WaiterDashboardProps> = ({
                 );
               })()}
 
-              <button
-                id="waiter-payment-submit-btn"
-                disabled={isSubmitting}
-                onClick={handleProcessPayment}
-                className="w-full py-3.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                {isSubmitting ? 'Processing Payment...' : 'Mark Paid & Free Table'}
-              </button>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={handleExportPdfReceipt}
+                  className="py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs flex items-center justify-center gap-1.5 border border-gray-200"
+                >
+                  <Receipt className="w-4 h-4 text-blue-600" />
+                  Export PDF
+                </button>
+
+                <button
+                  id="waiter-payment-submit-btn"
+                  disabled={isSubmitting}
+                  onClick={handleProcessPayment}
+                  className="py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  {isSubmitting ? 'Processing...' : 'Mark Paid & Free'}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -991,6 +1060,7 @@ export const WaiterDashboard: React.FC<WaiterDashboardProps> = ({
           onClose={() => setShowQRModal(false)}
           selectedTable={qrSelectedTable}
           tables={tables}
+          menuItems={menuItems}
         />
 
         {/* Custom Table Status Note Modal */}

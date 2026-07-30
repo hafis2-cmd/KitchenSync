@@ -944,13 +944,43 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 
         {/* TAB 3: Inventory Control */}
         {activeTab === 'inventory' && (
-          <div className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 space-y-4 shadow-sm">
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+          <div className="bg-white border border-gray-200 rounded-xl p-5 sm:p-6 space-y-5 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-200 pb-4">
               <div>
                 <h2 className="text-base font-bold text-gray-900">Ingredient Stock Levels & Restock Control</h2>
-                <p className="text-xs text-gray-500">Track key kitchen inventory and trigger 1-tap restocks.</p>
+                <p className="text-xs text-gray-500">Track key kitchen inventory and trigger 1-tap automated restocks.</p>
               </div>
+
+              {/* 1-Click AI Restock Trigger */}
+              {inventory.some((i) => i.stockQty <= i.lowStockThreshold) && (
+                <button
+                  onClick={async () => {
+                    const lowItems = inventory.filter((i) => i.stockQty <= i.lowStockThreshold);
+                    for (const item of lowItems) {
+                      await handleRestock(item.id, item.stockQty);
+                    }
+                    alert(`AI Restock Draft Executed: Restocked ${lowItems.length} low-stock ingredients!`);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-md shrink-0"
+                >
+                  <Sparkles className="w-4 h-4 text-white" />
+                  <span>⚡ 1-Click AI Restock All Low Stock</span>
+                </button>
+              )}
             </div>
+
+            {/* AI Restock Advisor Card */}
+            {inventory.some((i) => i.stockQty <= i.lowStockThreshold) && (
+              <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-amber-200 dark:border-amber-800 rounded-2xl space-y-2">
+                <div className="flex items-center gap-2 font-extrabold text-xs text-amber-900 dark:text-amber-200">
+                  <Sparkles className="w-4 h-4 text-amber-600 animate-pulse" />
+                  <span>Gemini AI Restock Advisor</span>
+                </div>
+                <p className="text-xs text-amber-800 dark:text-amber-300">
+                  {inventory.filter((i) => i.stockQty <= i.lowStockThreshold).length} ingredients are below threshold ({inventory.filter((i) => i.stockQty <= i.lowStockThreshold).map((i) => i.ingredientName).join(', ')}). Click the 1-Click AI Restock button above to issue automated supplier reorders.
+                </p>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {inventory.map((inv) => {

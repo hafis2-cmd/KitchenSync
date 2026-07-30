@@ -40,9 +40,26 @@ export const KitchenDisplay: React.FC<KitchenDisplayProps> = ({ currentUser, ord
 
   const activeOrders = orders.filter((o) => o.status !== 'billed' && o.status !== 'served' && o.status !== 'cancelled');
 
+  const [selectedStation, setSelectedStation] = useState<string>('All');
+
   const filteredOrders = activeOrders.filter((o) => {
-    if (filterStatus === 'all') return true;
-    return o.status === filterStatus;
+    const matchesStatus = filterStatus === 'all' || o.status === filterStatus;
+    if (!matchesStatus) return false;
+    if (selectedStation === 'All') return true;
+
+    return (o.items || []).some((it) => {
+      const name = it.menuItemName.toLowerCase();
+      if (selectedStation === 'Bar & Beverages') {
+        return name.includes('wine') || name.includes('beer') || name.includes('coke') || name.includes('water') || name.includes('drink') || name.includes('soda') || name.includes('juice');
+      }
+      if (selectedStation === 'Pastry & Desserts') {
+        return name.includes('cake') || name.includes('tiramisu') || name.includes('creme') || name.includes('pie') || name.includes('gelato') || name.includes('tart');
+      }
+      if (selectedStation === 'Pantry & Starters') {
+        return name.includes('soup') || name.includes('salad') || name.includes('fries') || name.includes('wings') || name.includes('bread');
+      }
+      return !name.includes('wine') && !name.includes('beer') && !name.includes('coke') && !name.includes('cake') && !name.includes('soup');
+    });
   });
 
   // Station Load Calculation (Items currently in 'preparing' status for each station)
@@ -148,6 +165,21 @@ export const KitchenDisplay: React.FC<KitchenDisplayProps> = ({ currentUser, ord
                 <span>{isClearingReady ? 'Clearing...' : `Clear Ready Orders (${readyOrders.length})`}</span>
               </button>
             )}
+
+            <div className="flex items-center gap-1.5 overflow-x-auto bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+              <span className="text-[10px] font-bold uppercase text-gray-400 px-1 hidden md:inline">Station:</span>
+              {['All', 'Grill & Mains', 'Pantry & Starters', 'Pastry & Desserts', 'Bar & Beverages'].map((st) => (
+                <button
+                  key={st}
+                  onClick={() => setSelectedStation(st)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
+                    selectedStation === st ? 'bg-amber-500 text-white shadow-xs' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  {st}
+                </button>
+              ))}
+            </div>
 
             <div className="flex items-center gap-1.5 overflow-x-auto bg-gray-100 dark:bg-gray-800 p-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
               {(['all', 'pending', 'preparing', 'ready'] as const).map((st) => (
