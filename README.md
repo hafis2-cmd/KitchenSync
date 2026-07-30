@@ -1,53 +1,71 @@
 Team sayujstaji : 
->Team Members:
-#Sayuj Staji
-#Ajishna Jaison
-#Hafis Mohammed K
-#Rahul Prakash
-
-# 🍽️ KitchenSync
-
-> **Unified Restaurant Operations Coordination Hub**  
-> A real-time, multi-role restaurant management platform that synchronizes waitstaff ordering, Kitchen Display Systems (KDS), and manager command operations with integrated Google Gemini AI intelligence.
+> **Team Members**:
+> - Sayuj Staji
+> - Ajishna Jaison
+> - Hafis Mohammed K
+> - Rahul Prakash
 
 ---
 
-## 🚀 Key Features
+# 🍽️ KitchenSync
 
-KitchenSync provides custom tailored workspaces for three core restaurant roles:
+> **Unified Enterprise Restaurant Operations Coordination Hub**  
+> A real-time, multi-role restaurant management platform that synchronizes waitstaff ordering, Kitchen Display Systems (KDS), digital menu management, and manager command operations with integrated Google Gemini AI intelligence and live Server-Sent Events (SSE).
 
-### 1. 📋 Waitstaff Dashboard
-* **Floor Plan Layout**: Visual restaurant seating layout showing real-time table statuses (`Empty`, `Occupied`, `Needs Cleaning`, `Reserved`).
-* **Digital Menu & Ordering**: Easy-to-use categorised menu selection with quantities and special preparation notes.
-* **🎙️ AI Voice Ordering**: Integrated Web Speech voice recognition module that parses verbal commands (e.g., *"Add one Wagyu Burger and two sodas"*) directly into the customer cart.
-* **Ready-to-Serve Notifications**: Visual and audio chime warnings when the kitchen finishes preparing a table's order.
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://c-dusky.vercel.app)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Express](https://img.shields.io/badge/Express-4.21-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 
-### 2. 🍳 Kitchen Display System (KDS)
-* **Ticket Prep Queue**: Incoming tickets sorted by order time with countdown timers.
-* **Station Breakdown**: Orders are organized by preparation station (Grill, Fryer, Pizza, Drinks) with individual check-offs.
-* **Urgent Alerts**: Floating high-priority banners for allergen warnings or manager shift announcements.
+---
 
-### 3. 📊 Manager Command Center
-* **Operational Analytics**: Live revenue charts, average ticket completion speeds, and guest volume tracking.
-* **Inventory Control**: Live tracking of ingredient levels with automated low-stock warnings when levels fall below thresholds.
-* **✨ Gemini AI Insights**: Leverage the Google GenAI SDK to generate detailed inventory risks, kitchen bottlenecks, and executive operational suggestions.
-* **📅 AI Staff Scheduler**: Generate optimized employee shift plans automatically based on sales performance and guest turnover patterns.
-* **Floor Plan Editor**: Built-in drag-and-drop coordinate floor editor to modify tables, capacities, and shapes on the fly.
+## 🚀 Newly Added Features (Phase 2 Upgrade)
 
-### ⚡ Developer Sandbox
-An interactive, collapsible simulation sidebar that allows developers to trigger multi-role conditions instantly:
-* **Dinner Rush Chaos**: Seats multiple empty tables, places complex food tickets, and triggers Truffle Oil stock depletion.
-* **Allergy Incident**: Places orders with peanut/gluten warnings and broadcasts urgent alerts to KDS screens.
-* **Staffing Crisis**: Submits mock waiter candidates, triggers Mozzarella/Salmon low-stock alerts, and posts handover alerts.
+### 🔐 1. Multi-Role Authentication & Session Persistence
+- **Tabbed Auth Portal (`AuthModal.tsx`)**: Unified Log In, Sign Up, and Demo Accounts switcher.
+- **Role Selection & Strength Meter**: Password strength scoring, password confirmation, and forgot password recovery.
+- **Role Access Control (`authPermissions.ts`)**: Strict capability checks and Manager PIN elevation (`1234`).
+- **Session Persistence**: Automatic session restoration on browser reload backed by `localStorage`.
+
+### 📄 2. Branded PDF Receipt Export & Split Billing
+- **PDF Receipt Engine (`WaiterDashboard.tsx`)**: Integrated `jsPDF` and `jspdf-autotable` to generate downloadable itemized receipts (`Receipt_Table_X.pdf`).
+- **Calculations**: Itemized unit prices, subtotal, 10% tax, discount adjustments, and payment method indicators (`Card`, `Cash`, `UPI`).
+
+### 🍳 3. KDS Station Routing & Countdown Timers
+- **Prep Station Filtering (`KitchenDisplay.tsx`)**: Filter tickets by line stations (`Grill & Mains`, `Pantry & Starters`, `Pastry & Desserts`, `Bar & Beverages`).
+- **Visual Urgency Timers**: Live color-coded countdown indicators:
+  - 🟢 **On Track** (`< 8 mins`)
+  - 🟡 **Attention Needed** (`8 - 15 mins`)
+  - 🔴 **Urgent / Overdue** (`> 15 mins`)
+
+### ⚡ 4. 1-Click AI Inventory Restock Advisor
+- **Gemini AI Restock Banner (`ManagerDashboard.tsx`)**: Detects low stock levels (`Truffle Oil`, `Mozzarella`, `Salmon`).
+- **Automated Purchase Orders**: **⚡ 1-Click AI Restock All Low Stock** button to issue automated supplier reorders in a single tap.
+
+### 📱 5. Interactive Customer QR Self-Order Simulator
+- **Guest Self-Order Mode (`TableQRModal.tsx`)**: Digital customer ordering simulator enabling guests to:
+  - Select table number & guest count.
+  - Browse digital menu items & adjust quantities.
+  - Add special dietary/allergen notes.
+  - Submit orders directly to the KDS queue, automatically updating table status to `Occupied`.
+
+### 🍽️ 6. Manager Add New Dish Control
+- **Live Dish Creation (`ManagerDashboard.tsx`)**: Managers can add new menu items with price, category, preparation time, description, ingredients, and custom image URLs.
+- **Live Multi-Role Sync**: Newly created dishes immediately sync across all Waitstaff POS screens, KDS prep stations, and Customer QR Ordering views via SSE streams.
+
+### 📱 7. Perfect Mobile View & iOS Ergonomics
+- **Touch Ergonomics**: `min-h-[44px]` tap targets on all inputs, select boxes, and submit buttons.
+- **iOS Safari Auto-Zoom Fix**: `text-base sm:text-xs` sizing prevents canvas shifts during mobile keyboard focus.
+- **Viewport-Safe Containers**: `max-h-[90vh] overflow-y-auto` modals and non-overlapping toast alert layers (`z-40` vs `z-50`).
 
 ---
 
 ## 🛠️ Technology Stack
 
-* **Frontend**: React 19, Vite 6, Tailwind CSS, Lucide React (Icons), Recharts (Analytics).
-* **Backend**: Express.js (Node), tsx (TypeScript Execution), Server-Sent Events (SSE) for 100ms real-time multi-client synchronization.
-* **Database/Cache**: In-memory store with optional Supabase write-through caching.
-* **AI Integration**: `@google/genai` (Gemini 3.6 Flash / 3.5 Flash).
+* **Frontend**: React 19, TypeScript, Vite 6, Tailwind CSS, Lucide React (Icons), Recharts (Analytics), jsPDF & jspdf-autotable (PDF Engine), Canvas-Confetti.
+* **Backend**: Node.js, Express.js, TypeScript, Server-Sent Events (SSE) for 100ms real-time multi-client synchronization.
+* **Database & Auth**: Supabase (PostgreSQL & Auth) with in-memory global state fallback for zero-downtime offline operation.
+* **AI Integration**: `@google/genai` (Gemini 2.5 Flash / 1.5 Pro) for inventory depletion risk auditing and voice order dictation parsing.
 
 ---
 
@@ -57,20 +75,18 @@ An interactive, collapsible simulation sidebar that allows developers to trigger
 kitchensyn/
 ├── dist/                   # Production build outputs
 ├── examples/               # Role-specific programmatic walkthrough clients
-│   ├── api_demo.js         # Basic REST & SSE event subscriber
 │   ├── waitstaff_demo.js   # Seats table & places orders
 │   ├── kitchen_demo.js     # Starts prep, marks items ready, posts notes
 │   ├── manager_demo.js     # Payments, inventory decay, AI insights runs
-│   └── api_requests.http   # VS Code REST client HTTP requests playbook
-├── public/                 # Static assets
+│   └── api_requests.http   # VS Code REST client playbook
 ├── src/                    # React SPA Frontend
 │   ├── components/         # Views and UI modals
-│   │   ├── kitchen/        # KDS Display tickets & components
-│   │   ├── manager/        # AI Scheduler, Analytics, Floor planner
-│   │   └── waiter/         # Seating charts, voice ordering, menus
+│   │   ├── kitchen/        # KDS Display tickets & prep station filters
+│   │   ├── manager/        # AI Scheduler, Analytics, Floor planner, Dish creator
+│   │   └── waiter/         # Seating charts, voice ordering, PDF billing
 │   ├── lib/                # Auth controls, API client endpoints
 │   ├── types/              # TypeScript interface definitions
-│   └── App.tsx             # Root Layout, Sandbox UI, and SSE listener
+│   └── App.tsx             # Root Layout, Suspense Lazy Loading, and SSE listener
 ├── server.ts               # Express Server & SSE Event Registry
 ├── vercel.json             # Vercel SPA routing redirects configuration
 └── supabase_schema.sql     # Postgres SQL definitions for database caching
@@ -81,10 +97,9 @@ kitchensyn/
 ## ⚙️ Local Development Setup
 
 ### 1. Prerequisites
-Ensure you have [Node.js](https://nodejs.org) (v18+) or [Bun](https://bun.sh) installed.
+Ensure you have [Node.js](https://nodejs.org) (v18+) installed.
 
 ### 2. Installation
-Clone the repository and install the dependencies:
 ```bash
 git clone https://github.com/hafis2-cmd/KitchenSync.git
 cd kitchensyn
@@ -92,7 +107,7 @@ npm install
 ```
 
 ### 3. Environment Configuration
-Create a `.env.local` or `.env` file in the root directory:
+Create a `.env` file in the root directory:
 ```env
 # Gemini API Access (Optional - Falls back to mock data if omitted)
 GEMINI_API_KEY="your-gemini-api-key-here"
@@ -103,7 +118,6 @@ SUPABASE_KEY="your-supabase-service-role-key"
 ```
 
 ### 4. Run the Dev Server
-Start the Express API server and Vite dev frontend:
 ```bash
 npm run dev
 ```
@@ -111,32 +125,8 @@ Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
 ---
 
-## 💻 Programmatic Section Demos
-
-For automated testing or developer integration, you can run any of the simulation clients located in the `examples/` directory while the server is active:
-
-```bash
-# Simulates waitstaff seating and ordering
-node examples/waitstaff_demo.js
-
-# Simulates cooking prep, ticking off items, and KDS note announcements
-node examples/kitchen_demo.js
-
-# Simulates billing checkout, inventory alert triggers, and AI insight evaluations
-node examples/manager_demo.js
-```
-
----
-
 ## 🌐 Production Deployment
 
-The project is structured to easily split-deploy across static hosts (like Vercel) and web service runners (like Render):
-
-* **Frontend (Vercel)**:
-  - Deploys as a static SPA.
-  - Automatically redirects API requests to the Render backend API using the `VITE_API_URL` environment variable, falling back automatically to `https://kitchensync-xxnc.onrender.com`.
-  - Routing handles rewrites locally through the `vercel.json` configuration.
-* **Backend (Render)**:
-  - Deploys as an Express Web Service.
-  - Build command: `npm run build`
-  - Start command: `npm run start` (runs the bundled `dist/server.cjs` file which serves the assets and hosts real-time SSE streams).
+- **Frontend (Vercel)**: Deployed at **[c-dusky.vercel.app](https://c-dusky.vercel.app)**
+- **Backend API (Render)**: Express web service serving SSE event streams.
+- **GitHub Repository**: **[https://github.com/hafis2-cmd/KitchenSync.git](https://github.com/hafis2-cmd/KitchenSync.git)**
