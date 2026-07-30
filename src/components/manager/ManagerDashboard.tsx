@@ -276,6 +276,8 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   const [newDishDesc, setNewDishDesc] = useState('');
   const [newDishPrepTime, setNewDishPrepTime] = useState(15);
   const [newDishIngredients, setNewDishIngredients] = useState('');
+  const [newDishImageUrl, setNewDishImageUrl] = useState('');
+  const [isSubmittingDish, setIsSubmittingDish] = useState(false);
 
   // AI Insights State
   const [aiInsights, setAiInsights] = useState<AIInsights | null>(null);
@@ -457,22 +459,34 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
   // Handle New Menu Creation
   const handleCreateMenuItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newDishName.trim()) return;
+    if (!newDishName.trim() || !newDishPrice) return;
+    setIsSubmittingDish(true);
 
-    await addMenuItem({
-      name: newDishName,
-      price: newDishPrice,
-      category: newDishCategory,
-      description: newDishDesc || 'Freshly prepared specialty dish.',
-      prepTimeMinutes: newDishPrepTime,
-      ingredients: newDishIngredients.split(',').map((s) => s.trim()).filter(Boolean),
-      isAvailable: true,
-      imageUrl: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400',
-    });
+    try {
+      const created = await addMenuItem({
+        name: newDishName.trim(),
+        price: Number(newDishPrice),
+        category: newDishCategory,
+        description: newDishDesc.trim() || `${newDishName.trim()} prepared fresh to order.`,
+        prepTimeMinutes: Number(newDishPrepTime) || 15,
+        ingredients: newDishIngredients.split(',').map((s) => s.trim()).filter(Boolean),
+        isAvailable: true,
+        imageUrl: newDishImageUrl.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400',
+      });
 
-    setShowAddMenuModal(false);
-    setNewDishName('');
-    setNewDishDesc('');
+      setShowAddMenuModal(false);
+      setNewDishName('');
+      setNewDishPrice(18);
+      setNewDishDesc('');
+      setNewDishIngredients('');
+      setNewDishImageUrl('');
+      alert(`🎉 Successfully added "${created.name}" ($${created.price.toFixed(2)}) to Digital Menu!\nIt is now immediately available across Waitstaff POS, Kitchen KDS, and Customer QR Ordering.`);
+    } catch (err) {
+      console.error('Failed to create menu dish:', err);
+      alert('Failed to add new dish to menu');
+    } finally {
+      setIsSubmittingDish(false);
+    }
   };
 
   // Handle Toggle Item Availability
@@ -1923,39 +1937,61 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 
         {/* Modal: Add New Dish */}
         {showAddMenuModal && (
-          <div className="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="relative w-full max-w-md bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 shadow-xl text-gray-900 space-y-4">
-              <h2 className="text-xl font-bold">Add New Menu Dish</h2>
-              <form onSubmit={handleCreateMenuItem} className="space-y-3 text-xs">
+          <div className="fixed inset-0 z-50 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+            <div className="relative w-full max-w-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8 shadow-2xl text-gray-900 dark:text-gray-100 space-y-4">
+              <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                    <UtensilsCrossed className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">Add New Menu Dish</h2>
+                    <p className="text-xs text-gray-500">Live syncs across Waiter POS, KDS, & Customer QR ordering</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowAddMenuModal(false)}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateMenuItem} className="space-y-3.5 text-xs">
                 <div>
-                  <label className="block text-gray-600 mb-1 font-medium">Dish Name</label>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1 font-bold">Dish Name *</label>
                   <input
                     type="text"
                     required
                     value={newDishName}
                     onChange={(e) => setNewDishName(e.target.value)}
-                    placeholder="e.g. Lobster Ravioli"
-                    className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white"
+                    placeholder="e.g. Pan-Seared Atlantic Salmon"
+                    className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:border-blue-600"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2.5">
                   <div>
-                    <label className="block text-gray-600 mb-1 font-medium">Price ($)</label>
+                    <label className="block text-gray-700 dark:text-gray-300 mb-1 font-bold">Price ($) *</label>
                     <input
                       type="number"
+                      step="0.5"
+                      min="1"
                       required
                       value={newDishPrice}
                       onChange={(e) => setNewDishPrice(Number(e.target.value))}
-                      className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white"
+                      className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-mono font-bold focus:outline-none focus:border-blue-600"
                     />
                   </div>
+
                   <div>
-                    <label className="block text-gray-600 mb-1 font-medium">Category</label>
+                    <label className="block text-gray-700 dark:text-gray-300 mb-1 font-bold">Category</label>
                     <select
                       value={newDishCategory}
                       onChange={(e) => setNewDishCategory(e.target.value as any)}
-                      className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-medium focus:outline-none"
                     >
                       <option value="Appetizers">Appetizers</option>
                       <option value="Mains">Mains</option>
@@ -1963,26 +1999,49 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                       <option value="Beverages">Beverages</option>
                     </select>
                   </div>
+
+                  <div>
+                    <label className="block text-gray-700 dark:text-gray-300 mb-1 font-bold">Prep Time (mins)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={newDishPrepTime}
+                      onChange={(e) => setNewDishPrepTime(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:border-blue-600"
+                    />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-gray-600 mb-1 font-medium">Description</label>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1 font-bold">Description</label>
                   <textarea
                     value={newDishDesc}
                     onChange={(e) => setNewDishDesc(e.target.value)}
                     rows={2}
-                    className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white"
+                    placeholder="Freshly prepared with seasonal ingredients, herbs, and house reduction..."
+                    className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:border-blue-600"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-gray-600 mb-1 font-medium">Ingredients (comma separated)</label>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1 font-bold">Ingredients (comma separated)</label>
                   <input
                     type="text"
                     value={newDishIngredients}
                     onChange={(e) => setNewDishIngredients(e.target.value)}
-                    placeholder="Lobster, Cream, Pasta, Garlic"
-                    className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-blue-600 focus:bg-white"
+                    placeholder="Salmon, Lemon, Garlic Butter, Asparagus"
+                    className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-medium focus:outline-none focus:border-blue-600"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 mb-1 font-bold">Image URL</label>
+                  <input
+                    type="url"
+                    value={newDishImageUrl}
+                    onChange={(e) => setNewDishImageUrl(e.target.value)}
+                    placeholder="https://images.unsplash.com/photo-..."
+                    className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs text-gray-900 dark:text-white font-mono focus:outline-none focus:border-blue-600"
                   />
                 </div>
 
@@ -1990,15 +2049,16 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowAddMenuModal(false)}
-                    className="flex-1 py-2.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold"
+                    className="flex-1 py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm"
+                    disabled={isSubmittingDish}
+                    className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-sm transition-all disabled:opacity-50"
                   >
-                    Create Dish
+                    {isSubmittingDish ? 'Adding Dish...' : '+ Add Dish to Live Menu'}
                   </button>
                 </div>
               </form>
